@@ -1,9 +1,11 @@
-'''
-from googletrans import Translator, LANGUAGES
 import streamlit as st
+from deep_translator import GoogleTranslator
 
-# Get language codes and names from googletrans
-language_options = {v: k for k, v in LANGUAGES.items()}
+# Get all supported languages
+languages_dict = GoogleTranslator().get_supported_languages(as_dict=True)
+
+# Reverse dictionary (same as your old logic)
+language_options = {v: k for k, v in languages_dict.items()}
 language_names = list(language_options.keys())
 
 st.title('Language Translator')
@@ -14,32 +16,21 @@ target_language = st.selectbox('Select Your Language', options=language_names)
 translate = st.button('Translate')
 
 if translate:
-    translator = Translator()
-    target_language_code = language_options[target_language]
-    out = translator.translate(source_text, dest=target_language_code)
-    st.write(out.text)
+    if source_text.strip() == "":
+        st.warning("Please enter text")
+    else:
+        try:
+            target_language_code = language_options[target_language]
 
-'''
-from googletrans import Translator, LANGUAGES
-import streamlit as st
+            translated = GoogleTranslator(
+                source='auto',
+                target=target_language_code
+            ).translate(source_text)
 
-# Get language codes and names from googletrans
-language_options = {v: k for k, v in LANGUAGES.items()}
-language_names = list(language_options.keys())
+            st.write(translated)
 
-st.title('Language Translator')
-
-source_text = st.text_input('Enter the text to translate')
-target_language = st.selectbox('Select Your Language', options=language_names)
-
-translate = st.button('Translate')
-
-if translate:
-    translator = Translator()
-    target_language_code = language_options[target_language]
-    out = translator.translate(source_text, dest=target_language_code)
-    st.write(out.text)
-
+        except Exception as e:
+            st.error("Translation failed")
 
 
 
